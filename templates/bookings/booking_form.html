@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load humanize static %}
+{% block title %}Book {{ room_type.name }} — Aurelia Hotel{% endblock %}
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'room_type_detail' room_type.pk %}" style="display: inline-flex; align-items: center; gap: 0.4rem; color: var(--ink-muted); font-size: 0.92rem;">← Back to {{ room_type.name }} details</a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 2.5rem; align-items: start;">
+    <!-- Room Summary Side -->
+    <div style="background: var(--surface-card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-md);">
+      <img src="{{ room_type.get_image_url }}" alt="{{ room_type.name }}" style="width: 100%; height: 200px; object-fit: cover; display: block;">
+      <div style="padding: 1.75rem;">
+        <p class="hero__eyebrow" style="margin-bottom: 0.25rem;">Selected Suite</p>
+        <h2 style="margin: 0; font-size: 1.5rem;">{{ room_type.name }}</h2>
+        <div style="margin: 0.75rem 0 1.25rem; font-size: 1.35rem; font-weight: 700; color: var(--accent);" class="mono">
+          ₦{{ room_type.base_price_per_night|intcomma }} <span style="font-size: 0.85rem; font-weight: normal; color: var(--ink-muted);">/ night</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 1rem; color: #cbd5e1; font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.6rem;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--ink-muted);">Standard Check-in</span>
+            <strong>2:00 PM</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--ink-muted);">Standard Check-out</span>
+            <strong>11:00 AM</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--ink-muted);">Max Guests Allowed</span>
+            <strong>{{ room_type.max_occupancy }} Persons</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Form Side -->
+    <div style="background: var(--surface-card); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: var(--radius); padding: 2.25rem; box-shadow: var(--shadow-lg);">
+      <p class="hero__eyebrow" style="margin-bottom: 0.25rem;">Reservation Form</p>
+      <h1 style="font-size: 1.85rem; margin: 0 0 1.5rem;">Confirm Dates & Stay</h1>
+
+      <form method="post" class="booking-form" id="bookingForm">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+          <div class="form-errors" style="margin-bottom: 1.5rem;">
+            {% for field in form %}
+              {% for error in field.errors %}<p style="margin: 0.2rem 0;"><strong>{{ field.label }}:</strong> {{ error }}</p>{% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}<p style="margin: 0.2rem 0;">{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Check-in Date</label>
+            <input type="date" name="check_in" id="id_check_in" value="{{ form.check_in.value|default:'' }}" required style="width: 100%; padding: 0.75rem 0.9rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Check-out Date</label>
+            <input type="date" name="check_out" id="id_check_out" value="{{ form.check_out.value|default:'' }}" required style="width: 100%; padding: 0.75rem 0.9rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Total Guests</label>
+          <input type="number" name="num_guests" id="id_num_guests" min="1" max="{{ room_type.max_occupancy }}" value="{{ form.num_guests.value|default:1 }}" required style="width: 100%; padding: 0.75rem 0.9rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Special Requests (Optional)</label>
+          <textarea name="special_requests" rows="3" style="width: 100%; padding: 0.75rem 0.9rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" placeholder="Airport pickup, high floor, early arrival, etc.">{{ form.special_requests.value|default:'' }}</textarea>
+        </div>
+
+        <!-- Dynamic Price Calculation Panel -->
+        <div id="priceSummary" style="background: #090e14; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1.75rem; display: none;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #cbd5e1; font-size: 0.95rem;">
+            <span>Total Duration</span>
+            <strong><span id="summaryNights">0</span> night(s)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--line); padding-top: 0.75rem; color: #fff; font-size: 1.1rem; align-items: baseline;">
+            <span>Estimated Total</span>
+            <span id="summaryTotal" class="mono" style="font-size: 1.4rem; font-weight: 700; color: var(--accent);">₦0</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--full" style="padding: 1rem; font-size: 1.05rem; font-weight: 700; border-radius: 30px;">Complete Reservation</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkInInput = document.getElementById('id_check_in');
+    const checkOutInput = document.getElementById('id_check_out');
+    const pricePerNight = {{ room_type.base_price_per_night }};
+    const summaryBox = document.getElementById('priceSummary');
+    const summaryNights = document.getElementById('summaryNights');
+    const summaryTotal = document.getElementById('summaryTotal');
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (checkInInput && !checkInInput.min) checkInInput.min = todayStr;
+    if (checkOutInput && !checkOutInput.min) checkOutInput.min = todayStr;
+
+    function calculateTotal() {
+      if (!checkInInput || !checkOutInput) return;
+      const checkInVal = checkInInput.value;
+      const checkOutVal = checkOutInput.value;
+
+      if (checkInVal) {
+        checkOutInput.min = checkInVal;
+      }
+
+      if (checkInVal && checkOutVal) {
+        const d1 = new Date(checkInVal);
+        const d2 = new Date(checkOutVal);
+        const diffTime = d2 - d1;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 0) {
+          const total = diffDays * pricePerNight;
+          summaryNights.textContent = diffDays;
+          summaryTotal.textContent = '₦' + total.toLocaleString();
+          summaryBox.style.display = 'block';
+          return;
+        }
+      }
+      summaryBox.style.display = 'none';
+    }
+
+    if (checkInInput && checkOutInput) {
+      checkInInput.addEventListener('change', calculateTotal);
+      checkOutInput.addEventListener('change', calculateTotal);
+      calculateTotal();
+    }
+  });
+</script>
+{% endblock %}

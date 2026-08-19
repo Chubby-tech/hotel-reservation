@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}My Bookings — Aurelia Hotel{% endblock %}
+{% block content %}
+<h1>My Bookings</h1>
+{% if bookings %}
+<div class="table-responsive">
+  <table class="bookings-table">
+    <thead><tr><th>Room</th><th>Dates</th><th>Status</th><th>Total</th><th></th></tr></thead>
+    <tbody>
+      {% for booking in bookings %}
+      <tr>
+        <td><strong>{{ booking.room.room_type.name }}</strong><br><span style="color: var(--ink-muted); font-size: 0.82rem;">Room {{ booking.room.room_number }}</span></td>
+        <td class="mono">{{ booking.check_in }} → {{ booking.check_out }}</td>
+        <td><span class="tag tag--{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+        <td class="mono" style="font-weight: 600;">₦{{ booking.total_price|intcomma }}</td>
+        <td><a href="{% url 'booking_detail' booking.pk %}" class="btn btn--ghost btn--small">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p>You don't have any bookings yet. <a href="{% url 'room_list' %}">Browse available rooms</a>.</p>
+{% endif %}
+{% endblock %}

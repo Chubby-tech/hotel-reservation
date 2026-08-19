@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Staff desk — Aurelia Hotel{% endblock %}
+{% block content %}
+<h1>Staff desk</h1>
+<p class="hero__eyebrow">Active bookings, earliest check-in first</p>
+<table class="bookings-table">
+  <thead><tr><th>Guest</th><th>Room</th><th>Dates</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>
+    {% for booking in bookings %}
+    <tr>
+      <td>{{ booking.guest.username }}</td>
+      <td>{{ booking.room.room_type.name }} · Rm {{ booking.room.room_number }}</td>
+      <td class="mono">{{ booking.check_in }} → {{ booking.check_out }}</td>
+      <td><span class="tag tag--{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+      <td class="staff-actions">
+        {% if booking.status == "pending" %}
+        <form method="post" action="{% url 'staff_update_status' booking.pk 'confirmed' %}">{% csrf_token %}<button class="btn btn--small">Confirm</button></form>
+        {% endif %}
+        {% if booking.status == "confirmed" %}
+        <form method="post" action="{% url 'staff_update_status' booking.pk 'checked_in' %}">{% csrf_token %}<button class="btn btn--small">Check in</button></form>
+        {% endif %}
+        {% if booking.status == "checked_in" %}
+        <form method="post" action="{% url 'staff_update_status' booking.pk 'checked_out' %}">{% csrf_token %}<button class="btn btn--small">Check out</button></form>
+        {% endif %}
+        {% if booking.status != "checked_out" %}
+        <form method="post" action="{% url 'staff_update_status' booking.pk 'cancelled' %}">{% csrf_token %}<button class="btn btn--small btn--danger">Cancel</button></form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No active bookings.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Guest Registration — Aurelia Hotel{% endblock %}
+{% block content %}
+<div class="form-panel" style="max-width: 520px; margin: 3rem auto; padding: 2.75rem 2.25rem;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <p class="hero__eyebrow" style="margin-bottom: 0.35rem;">Join Aurelia Hotel</p>
+    <h1 style="font-size: 2.2rem; margin: 0;">Create Account</h1>
+    <p style="color: var(--ink-muted); font-size: 0.95rem; margin-top: 0.5rem;">Register to book luxurious rooms and manage your reservations effortlessly.</p>
+  </div>
+
+  <form method="post" class="custom-auth-form">
+    {% csrf_token %}
+    {% if form.errors %}
+      <div class="form-errors" style="margin-bottom: 1.5rem;">
+        {% for field in form %}
+          {% for error in field.errors %}<p style="margin: 0.2rem 0;"><strong>{{ field.label }}:</strong> {{ error }}</p>{% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}<p style="margin: 0.2rem 0;">{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <div style="margin-bottom: 1.25rem;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Username</label>
+      <input type="text" name="username" value="{{ form.username.value|default:'' }}" required style="width: 100%; padding: 0.85rem 1.1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 1rem;" placeholder="Choose a username">
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Email Address</label>
+      <input type="email" name="email" value="{{ form.email.value|default:'' }}" required style="width: 100%; padding: 0.85rem 1.1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 1rem;" placeholder="name@example.com">
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Password</label>
+      <input type="password" name="password1" required style="width: 100%; padding: 0.85rem 1.1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 1rem;" placeholder="Create password">
+    </div>
+
+    <div style="margin-bottom: 1.75rem;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.05em;">Confirm Password</label>
+      <input type="password" name="password2" required style="width: 100%; padding: 0.85rem 1.1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 1rem;" placeholder="Repeat password">
+    </div>
+
+    <button type="submit" class="btn btn--primary btn--full" style="padding: 0.9rem; font-size: 1.05rem; font-weight: 700; border-radius: 30px;">Complete Registration</button>
+  </form>
+
+  <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line);">
+    <p style="color: var(--ink-muted); font-size: 0.92rem; margin: 0;">Already registered? <a href="{% url 'login' %}" style="font-weight: 600;">Log in here</a></p>
+  </div>
+</div>
+{% endblock %}

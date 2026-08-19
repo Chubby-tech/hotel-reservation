@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Booking #{{ booking.pk }} — Aurelia Hotel{% endblock %}
+{% block content %}
+<div class="form-panel">
+  <h1>Booking #{{ booking.pk }}</h1>
+  <p><span class="tag tag--{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+  <dl class="booking-detail">
+    <dt>Room</dt><dd>{{ booking.room.room_type.name }} · Room {{ booking.room.room_number }}</dd>
+    <dt>Dates</dt><dd class="mono">{{ booking.check_in }} → {{ booking.check_out }} ({{ booking.nights }} night{{ booking.nights|pluralize }})</dd>
+    <dt>Guests</dt><dd>{{ booking.num_guests }}</dd>
+    <dt>Total</dt><dd class="mono">₦{{ booking.total_price|intcomma }}</dd>
+    {% if booking.special_requests %}<dt>Special requests</dt><dd>{{ booking.special_requests }}</dd>{% endif %}
+  </dl>
+
+  {% if booking.can_be_cancelled %}
+  <form method="post" action="{% url 'booking_cancel' booking.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn--danger">Cancel booking</button>
+  </form>
+  {% endif %}
+  <a href="{% url 'booking_list' %}">← Back to my bookings</a>
+</div>
+{% endblock %}
