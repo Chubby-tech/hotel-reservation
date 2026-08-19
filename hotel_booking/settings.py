@@ -1,22 +1,34 @@
 """
 Django settings for the hotel_booking project.
-
-This is a development configuration (SQLite, DEBUG=True). See README.md
-for what to change before deploying anywhere public.
 """
 
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep this secret in production — move it to an
-# environment variable before you deploy this anywhere public.
-SECRET_KEY = "django-insecure-change-this-before-you-deploy-anywhere-public"
 
-# SECURITY WARNING: don't run with DEBUG turned on in production.
-DEBUG = True
+# ============================================================
+# SECURITY
+# ============================================================
 
-ALLOWED_HOSTS = []
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-development-key-change-in-production"
+)
+
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+]
+
+
+# ============================================================
+# APPLICATIONS
+# ============================================================
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -26,11 +38,22 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+
+    # Project apps
     "bookings.apps.BookingsConfig",
 ]
 
+
+# ============================================================
+# MIDDLEWARE
+# ============================================================
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
+    # Serve static files in production
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -38,6 +61,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+
+# ============================================================
+# URL / WSGI
+# ============================================================
 
 ROOT_URLCONF = "hotel_booking.urls"
 
@@ -59,6 +87,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "hotel_booking.wsgi.application"
 
+
+# ============================================================
+# DATABASE
+# ============================================================
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -66,28 +99,95 @@ DATABASES = {
     }
 }
 
+
+# ============================================================
+# PASSWORD VALIDATION
+# ============================================================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
+
+# ============================================================
+# INTERNATIONALIZATION
+# ============================================================
+
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "Africa/Lagos"
+
 USE_I18N = True
+
 USE_TZ = True
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# ============================================================
+# STATIC FILES
+# ============================================================
+
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "media/"
+STATICFILES_STORAGE = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
+
+
+# ============================================================
+# MEDIA FILES
+# ============================================================
+
+MEDIA_URL = "/media/"
+
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+# ============================================================
+# DEFAULT PRIMARY KEY
+# ============================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Auth flow
+
+# ============================================================
+# AUTHENTICATION
+# ============================================================
+
 LOGIN_URL = "login"
+
 LOGIN_REDIRECT_URL = "room_list"
+
 LOGOUT_REDIRECT_URL = "room_list"
+
+
+# ============================================================
+# PRODUCTION SECURITY
+# ============================================================
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    SESSION_COOKIE_SECURE = True
+
+    CSRF_COOKIE_SECURE = True
+
+    SECURE_BROWSER_XSS_FILTER = True
+
+    SECURE_CONTENT_TYPE_NOSNIFF = True
