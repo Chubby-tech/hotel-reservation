@@ -5,6 +5,8 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
 from django.views.static import serve
 
+from bookings import views as booking_views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
@@ -14,7 +16,7 @@ urlpatterns = [
     ),
     path(
         "accounts/logout/",
-        auth_views.LogoutView.as_view(next_page="login"),
+        booking_views.user_logout,
         name="logout",
     ),
     path("", include("bookings.urls")),

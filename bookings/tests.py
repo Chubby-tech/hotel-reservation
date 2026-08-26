@@ -128,4 +128,16 @@ class NavigationAndRoomListViewTests(TestCase):
         self.assertContains(response, "Deluxe Suite")
         self.assertIsNotNone(response.context["search_form"])
 
+    def test_logout_with_get_and_post_redirects_to_login(self):
+        self.client.login(username="testuser", password="password123")
+        # GET logout
+        response_get = self.client.get("/accounts/logout/")
+        self.assertRedirects(response_get, "/accounts/login/")
+
+        # POST logout
+        self.client.login(username="testuser", password="password123")
+        response_post = self.client.post("/accounts/logout/")
+        self.assertRedirects(response_post, "/accounts/login/")
+
+
 

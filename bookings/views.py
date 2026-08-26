@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -178,6 +178,14 @@ def register(request):
     else:
         form = SignUpForm()
     return render(request, "bookings/register.html", {"form": form})
+
+
+def user_logout(request):
+    """Log out the user and redirect to login page for both GET and POST."""
+    auth_logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect("login")
+
 
 
 # ---------- Staff-facing views ----------
