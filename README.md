@@ -9,18 +9,30 @@ double-booking. Staff confirm, check guests in/out, and manage inventory.
 ```bash
 cd hotel_booking
 python3 -m venv venv
-source venv/bin/activate        # on Windows: source venv\Scripts\activate
+source venv/bin/activate        # on Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 python manage.py migrate
-python manage.py createsuperuser   # your staff/admin login
-python manage.py seed_demo_data    # optional: adds 3 room types + 9 rooms
+python manage.py seed_demo_data    # adds 10 luxury room types, physical rooms & admin accounts
 python manage.py runserver
 ```
+
+### Pre-configured Admin & Staff Accounts
+The database and demo seeder include pre-configured admin and staff accounts:
+
+| Role | Username | Password | Email | Access |
+| :--- | :--- | :--- | :--- | :--- |
+| **Main Admin** | `admin` | `admin` | `admin@aureliahotel.com` | Full Superuser & Staff |
+| **Staff Admin 1** | `admin1` | `admin` | `admin1@aureliahotel.com` | Superuser & Staff |
+| **Staff Admin 2** | `admin2` | `admin` | `admin2@aureliahotel.com` | Superuser & Staff |
+| **Staff Admin 3** | `admin3` | `admin` | `admin3@aureliahotel.com` | Superuser & Staff |
+| **Staff Admin 4** | `admin4` | `admin` | `admin4@aureliahotel.com` | Superuser & Staff |
+| **Staff Admin 5** | `admin5` | `admin` | `admin5@aureliahotel.com` | Superuser & Staff |
 
 Visit `http://127.0.0.1:8000/`. Log into `/admin/` with your superuser to
 manage room types and rooms directly, or visit `/staff/` (as a staff user)
 for the day-to-day confirm/check-in/check-out desk.
+
 
 If `python manage.py migrate` complains about the included migration, it's
 because I hand-wrote it without being able to run Django in this sandbox

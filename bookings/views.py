@@ -14,26 +14,29 @@ def is_staff_user(user):
 # ---------- Guest-facing views ----------
 
 def room_list(request):
-    """Browse room types, optionally filtered by a date range + guest count."""
-    search_form = RoomSearchForm(request.GET or None)
+    """Browse room types. Search & date availability filtering is available for logged-in users."""
+    search_form = None
     queryset = RoomType.objects.all()
     searched = False
     results = []
 
-    if request.GET and search_form.is_valid():
-        searched = True
-        check_in = search_form.cleaned_data["check_in"]
-        check_out = search_form.cleaned_data["check_out"]
-        guests = search_form.cleaned_data["guests"]
-        queryset = queryset.filter(max_occupancy__gte=guests)
-        for room_type in queryset:
-            results.append(
-                {
-                    "room_type": room_type,
-                    "available": room_type.rooms_available_between(check_in, check_out).count(),
-                }
-            )
-    else:
+    if request.user.is_authenticated:
+        search_form = RoomSearchForm(request.GET or None)
+        if request.GET and search_form.is_valid():
+            searched = True
+            check_in = search_form.cleaned_data["check_in"]
+            check_out = search_form.cleaned_data["check_out"]
+            guests = search_form.cleaned_data["guests"]
+            queryset = queryset.filter(max_occupancy__gte=guests)
+            for room_type in queryset:
+                results.append(
+                    {
+                        "room_type": room_type,
+                        "available": room_type.rooms_available_between(check_in, check_out).count(),
+                    }
+                )
+
+    if not searched:
         results = [{"room_type": rt, "available": None} for rt in queryset]
 
     return render(
@@ -43,9 +46,10 @@ def room_list(request):
             "search_form": search_form,
             "results": results,
             "searched": searched,
-            "request_get": request.GET,
+            "request_get": request.GET if request.user.is_authenticated else {},
         },
     )
+
 
 
 def room_type_detail(request, pk):

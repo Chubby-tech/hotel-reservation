@@ -3,17 +3,9 @@
 {% block title %}Rooms & Suites — Aurelia Hotel{% endblock %}
 {% block content %}
 
-<section class="hero-banner">
-  <div class="hero-banner__content">
-    <p class="hero__eyebrow">Aurelia Luxury Hotel & Resort</p>
-    <h1>Experience Unmatched Comfort & Luxury</h1>
-    <p class="hero-banner__sub">Book your stay in our handcrafted rooms and suites for an unforgettable getaway.</p>
-  </div>
-</section>
-
-<section class="hero" style="margin-top: -3.5rem; position: relative; z-index: 20;">
-  <div class="search-card">
-    <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 0.85rem;">
+{% if user.is_authenticated %}
+  <section class="search-card" style="margin: 0 auto 2.5rem;">
+    <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
       <span style="font-weight: 700; color: #fff; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
         📅 Check Availability & Real-Time Booking
       </span>
@@ -58,45 +50,58 @@
         </div>
       {% endif %}
     </form>
-  </div>
-</section>
+  </section>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const inInput = document.getElementById('home_check_in');
-    const outInput = document.getElementById('home_check_out');
-    const stayBox = document.getElementById('homeStayIndicator');
-    const stayNights = document.getElementById('homeStayNights');
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const inInput = document.getElementById('home_check_in');
+      const outInput = document.getElementById('home_check_out');
+      const stayBox = document.getElementById('homeStayIndicator');
+      const stayNights = document.getElementById('homeStayNights');
 
-    const today = new Date().toISOString().split('T')[0];
-    if (inInput && !inInput.min) inInput.min = today;
-    if (outInput && !outInput.min) outInput.min = today;
+      const today = new Date().toISOString().split('T')[0];
+      if (inInput && !inInput.min) inInput.min = today;
+      if (outInput && !outInput.min) outInput.min = today;
 
-    function updateStay() {
-      if (!inInput || !outInput) return;
-      if (inInput.value) {
-        outInput.min = inInput.value;
-      }
-      if (inInput.value && outInput.value) {
-        const d1 = new Date(inInput.value);
-        const d2 = new Date(outInput.value);
-        const diffDays = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
-        if (diffDays > 0) {
-          stayNights.textContent = diffDays;
-          stayBox.style.display = 'block';
-          return;
+      function updateStay() {
+        if (!inInput || !outInput) return;
+        if (inInput.value) {
+          outInput.min = inInput.value;
         }
+        if (inInput.value && outInput.value) {
+          const d1 = new Date(inInput.value);
+          const d2 = new Date(outInput.value);
+          const diffDays = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
+          if (diffDays > 0) {
+            stayNights.textContent = diffDays;
+            stayBox.style.display = 'block';
+            return;
+          }
+        }
+        stayBox.style.display = 'none';
       }
-      stayBox.style.display = 'none';
-    }
 
-    if (inInput && outInput) {
-      inInput.addEventListener('change', updateStay);
-      outInput.addEventListener('change', updateStay);
-      updateStay();
-    }
-  });
-</script>
+      if (inInput && outInput) {
+        inInput.addEventListener('change', updateStay);
+        outInput.addEventListener('change', updateStay);
+        updateStay();
+      }
+    });
+  </script>
+{% else %}
+  <!-- Non-authenticated guest header -->
+  <div style="background: var(--surface-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.75rem 2rem; margin-bottom: 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem;">
+    <div>
+      <p class="hero__eyebrow" style="margin: 0 0 0.35rem;">Aurelia Hotel & Suites</p>
+      <h1 style="font-size: 2rem; margin: 0 0 0.35rem;">Rooms & Suites</h1>
+      <p style="margin: 0; color: var(--ink-muted); font-size: 0.95rem;">Explore our handcrafted rooms and amenities below. Please log in to search availability and make reservations.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <a href="{% url 'login' %}" class="btn btn--primary" style="border-radius: 30px; padding: 0.65rem 1.5rem;">Log in to Search & Book</a>
+      <a href="{% url 'register' %}" class="btn btn--ghost" style="border-radius: 30px; padding: 0.65rem 1.25rem;">Sign Up</a>
+    </div>
+  </div>
+{% endif %}
 
 <section class="room-grid">
   {% for row in results %}
@@ -109,46 +114,56 @@
         </div>
       </div>
       <div class="room-card__body">
-        <h2>{{ room_type.name }}</h2>
-        <p class="room-card__desc">{{ room_type.description|truncatewords:20 }}</p>
-        <div class="room-card__meta">
-          <span>👥 Up to {{ room_type.max_occupancy }} guest{{ room_type.max_occupancy|pluralize }}</span>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+          <h2 style="margin: 0; font-size: 1.4rem;">{{ room_type.name }}</h2>
+          <span style="font-size: 0.82rem; color: var(--accent); font-weight: 600;">👥 Max {{ room_type.max_occupancy }} guest{{ room_type.max_occupancy|pluralize }}</span>
         </div>
+        
+        <p class="room-card__desc">{{ room_type.description }}</p>
+
+        {% if room_type.amenity_list %}
+          <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0;">
+            {% for amenity in room_type.amenity_list %}
+              <span style="background: #090e14; border: 1px solid var(--line); font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 12px; color: #cbd5e1;">
+                ✓ {{ amenity }}
+              </span>
+            {% endfor %}
+          </div>
+        {% endif %}
+
         {% if searched %}
           <div style="margin-top: 0.3rem;">
             {% if row.available > 0 %}
-              <span class="availability availability--yes">✓ {{ row.available }} room{{ row.available|pluralize }} available</span>
+              <span class="availability availability--yes">✓ {{ row.available }} room{{ row.available|pluralize }} available for selected dates</span>
             {% else %}
-              <span class="availability availability--no">✕ Fully booked for dates</span>
+              <span class="availability availability--no">✕ Fully booked for selected dates</span>
             {% endif %}
           </div>
         {% endif %}
-        <div style="margin-top: auto; padding-top: 0.75rem;">
-          <a class="btn btn--ghost btn--full" href="{% url 'room_type_detail' room_type.pk %}?{{ request_get.urlencode }}">View details & book</a>
+
+        <div style="margin-top: auto; padding-top: 1rem; display: flex; gap: 0.6rem;">
+          <a class="btn btn--ghost btn--full" href="{% url 'room_type_detail' room_type.pk %}{% if request_get %}?{{ request_get.urlencode }}{% endif %}">
+            View Details
+          </a>
+          {% if user.is_authenticated %}
+            <a class="btn btn--primary btn--full" href="{% url 'create_booking' room_type.pk %}{% if request_get %}?{{ request_get.urlencode }}{% endif %}">
+              Book Now
+            </a>
+          {% else %}
+            <a class="btn btn--primary btn--full" href="{% url 'login' %}?next={% url 'room_type_detail' room_type.pk %}">
+              Log in to Book
+            </a>
+          {% endif %}
         </div>
       </div>
     </article>
     {% endwith %}
   {% empty %}
-    <p>No room types match your search criteria.</p>
+    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--surface-card); border-radius: var(--radius); border: 1px solid var(--line);">
+      <p style="color: #cbd5e1; font-size: 1.1rem; margin: 0 0 1rem;">No room types match your search criteria.</p>
+      <a href="{% url 'room_list' %}" class="btn btn--ghost">Clear search</a>
+    </div>
   {% endfor %}
 </section>
-
-<section class="hotel-highlights">
-  <div class="highlight-card">
-    <div style="font-size: 2rem;">✨</div>
-    <h4>World-Class Hospitality</h4>
-    <p>Enjoy 24/7 dedicated room service, private concierge, and VIP handling.</p>
-  </div>
-  <div class="highlight-card">
-    <div style="font-size: 2rem;">🌊</div>
-    <h4>Infinity Pool & Ocean View</h4>
-    <p>Relax by our signature sunset infinity pool overlooking breathtaking panoramas.</p>
-  </div>
-  <div class="highlight-card">
-    <div style="font-size: 2rem;">🍽️</div>
-    <h4>Fine Dining & Bar</h4>
-    <p>Savor gourmet dining prepared by Michelin-starred culinary chefs.</p>
-  </div>
-</section>
 {% endblock %}
+

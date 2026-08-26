@@ -91,3 +91,32 @@ class AvailabilityTests(TestCase):
         )
         self.assertEqual(booking.nights, 3)
         self.assertEqual(booking.total_price, 30000)
+
+
+class RoomListViewTests(TestCase):
+    def setUp(self):
+        self.room_type = RoomType.objects.create(
+            name="Deluxe Suite",
+            description="Spacious luxury suite with sea view",
+            base_price_per_night=25000,
+            max_occupancy=3,
+            amenities="Wi-Fi, Air conditioning, King Bed",
+        )
+        self.user = User.objects.create_user(username="testuser", password="password123")
+
+    def test_unauthenticated_user_sees_room_details_without_search_form(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Deluxe Suite")
+        self.assertContains(response, "Wi-Fi")
+        self.assertContains(response, "Log in to Search & Book")
+        self.assertNotContains(response, "Find Free Rooms")
+        self.assertIsNone(response.context["search_form"])
+
+    def test_authenticated_user_can_search_rooms(self):
+        self.client.login(username="testuser", password="password123")
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Find Free Rooms")
+        self.assertIsNotNone(response.context["search_form"])
+

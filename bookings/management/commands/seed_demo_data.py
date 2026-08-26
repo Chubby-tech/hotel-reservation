@@ -1,3 +1,7 @@
+from pathlib import Path
+import shutil
+
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from bookings.models import Room, RoomType
@@ -115,4 +119,37 @@ class Command(BaseCommand):
                 if room_created:
                     self.stdout.write(f"  + Room {number}")
 
-        self.stdout.write(self.style.SUCCESS("Demo data ready. Run `python manage.py runserver` and take a look."))
+        # Seed Admin & Staff Accounts
+        from django.contrib.auth.models import User
+        import shutil
+        from django.conf import settings
+
+        # Ensure media images exist from static images
+        static_rooms_dir = settings.BASE_DIR / "static" / "images" / "rooms"
+        media_rooms_dir = Path(settings.MEDIA_ROOT) / "rooms"
+        if static_rooms_dir.exists():
+            media_rooms_dir.mkdir(parents=True, exist_ok=True)
+            for img_file in static_rooms_dir.glob("*.jpg"):
+                dest_file = media_rooms_dir / img_file.name
+                if not dest_file.exists():
+                    shutil.copy2(img_file, dest_file)
+
+        admin_accounts = [
+            ("admin", "admin@aureliahotel.com", True),
+            ("admin1", "admin1@aureliahotel.com", True),
+            ("admin2", "admin2@aureliahotel.com", True),
+            ("admin3", "admin3@aureliahotel.com", True),
+            ("admin4", "admin4@aureliahotel.com", True),
+            ("admin5", "admin5@aureliahotel.com", True),
+        ]
+        for uname, email, is_super in admin_accounts:
+            user, u_created = User.objects.get_or_create(username=uname)
+            user.email = email
+            user.is_staff = True
+            user.is_superuser = is_super
+            user.set_password("admin")
+            user.save()
+            self.stdout.write(f"{'Created' if u_created else 'Updated'} staff/admin account: {uname} (password: admin)")
+
+        self.stdout.write(self.style.SUCCESS("Demo data & admin accounts ready. Run `python manage.py runserver` and take a look."))
+
