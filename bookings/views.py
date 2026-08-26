@@ -13,14 +13,26 @@ def is_staff_user(user):
 
 # ---------- Guest-facing views ----------
 
+def ensure_rooms_seeded():
+    """Ensure database has rooms and admin accounts seeded if empty."""
+    if not RoomType.objects.exists():
+        from django.core.management import call_command
+        try:
+            call_command("seed_demo_data")
+        except Exception:
+            pass
+
+
 def home(request):
     """Homepage showcasing hotel overview, highlights, and featured rooms."""
+    ensure_rooms_seeded()
     featured_rooms = RoomType.objects.all()[:4]
     return render(request, "bookings/home.html", {"featured_rooms": featured_rooms})
 
 
 def room_list(request):
     """Browse room types. Search & date availability filtering is available for logged-in users."""
+    ensure_rooms_seeded()
     search_form = None
     queryset = RoomType.objects.all()
     searched = False

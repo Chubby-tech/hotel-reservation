@@ -12,8 +12,8 @@
       Indulge in sanctuary suites, panoramic ocean views, and award-winning dining tailored to craft unforgettable memories.
     </p>
     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <a href="{% url 'room_list' %}" class="btn btn--primary" style="padding: 0.95rem 2rem; border-radius: 30px; font-size: 1.05rem; font-weight: 700;">
-        Explore All Rooms & Book →
+      <a href="{% url 'room_list' %}" class="btn btn--primary" style="padding: 0.95rem 2.5rem; border-radius: 30px; font-size: 1.1rem; font-weight: 700;">
+        Book Now
       </a>
       {% if not user.is_authenticated %}
         <a href="{% url 'login' %}" class="btn btn--ghost" style="padding: 0.95rem 1.75rem; border-radius: 30px; font-size: 1.05rem;">
@@ -67,8 +67,8 @@
       <h2 style="font-size: 2.2rem; margin: 0;">Featured Rooms & Suites</h2>
       <p style="color: var(--ink-muted); margin: 0.35rem 0 0; font-size: 0.98rem;">A handpicked selection of our most popular luxury sanctuaries.</p>
     </div>
-    <a href="{% url 'room_list' %}" class="btn btn--ghost" style="border-radius: 30px; font-weight: 600;">
-      View All 10 Rooms →
+    <a href="{% url 'room_list' %}" class="btn btn--primary" style="border-radius: 30px; font-weight: 600; padding: 0.65rem 1.4rem;">
+      Book Now
     </a>
   </div>
 
@@ -127,7 +127,7 @@
     Browse all our available rooms, check dates, and book your private retreat with instant confirmation.
   </p>
   <a href="{% url 'room_list' %}" class="btn btn--primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 30px; font-weight: 700;">
-    Book Your Room Now
+    Book Now
   </a>
 </section>
 
