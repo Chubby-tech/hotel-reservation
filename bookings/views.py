@@ -13,6 +13,12 @@ def is_staff_user(user):
 
 # ---------- Guest-facing views ----------
 
+def home(request):
+    """Homepage showcasing hotel overview, highlights, and featured rooms."""
+    featured_rooms = RoomType.objects.all()[:4]
+    return render(request, "bookings/home.html", {"featured_rooms": featured_rooms})
+
+
 def room_list(request):
     """Browse room types. Search & date availability filtering is available for logged-in users."""
     search_form = None

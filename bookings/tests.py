@@ -93,7 +93,7 @@ class AvailabilityTests(TestCase):
         self.assertEqual(booking.total_price, 30000)
 
 
-class RoomListViewTests(TestCase):
+class NavigationAndRoomListViewTests(TestCase):
     def setUp(self):
         self.room_type = RoomType.objects.create(
             name="Deluxe Suite",
@@ -104,8 +104,15 @@ class RoomListViewTests(TestCase):
         )
         self.user = User.objects.create_user(username="testuser", password="password123")
 
-    def test_unauthenticated_user_sees_room_details_without_search_form(self):
+    def test_homepage_shows_featured_rooms_and_amenities(self):
         response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Experience Unmatched Comfort & Luxury")
+        self.assertContains(response, "Featured Rooms & Suites")
+        self.assertContains(response, "Deluxe Suite")
+
+    def test_unauthenticated_user_sees_room_details_without_search_form_on_rooms_page(self):
+        response = self.client.get("/rooms/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Deluxe Suite")
         self.assertContains(response, "Wi-Fi")
@@ -113,10 +120,12 @@ class RoomListViewTests(TestCase):
         self.assertNotContains(response, "Find Free Rooms")
         self.assertIsNone(response.context["search_form"])
 
-    def test_authenticated_user_can_search_rooms(self):
+    def test_authenticated_user_can_search_rooms_and_sees_rooms_before_search(self):
         self.client.login(username="testuser", password="password123")
-        response = self.client.get("/")
+        response = self.client.get("/rooms/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find Free Rooms")
+        self.assertContains(response, "Deluxe Suite")
         self.assertIsNotNone(response.context["search_form"])
+
 

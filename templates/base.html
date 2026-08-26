@@ -292,11 +292,12 @@
 <body>
 <header class="nav-wrapper">
   <nav class="nav">
-    <a href="{% url 'room_list' %}" class="brand">
+    <a href="{% url 'home' %}" class="brand">
       Aurelia <span>Hotel</span>
     </a>
     <div class="nav__links">
-      <a href="{% url 'room_list' %}">Rooms & Suites</a>
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'room_list' %}">Rooms & Booking</a>
       {% if user.is_authenticated %}
         <a href="{% url 'booking_list' %}">My Bookings</a>
         {% if user.is_staff %}<a href="{% url 'staff_dashboard' %}">Staff Desk</a>{% endif %}
