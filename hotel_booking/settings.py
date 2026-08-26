@@ -175,7 +175,7 @@ LOGIN_URL = "login"
 
 LOGIN_REDIRECT_URL = "room_list"
 
-LOGOUT_REDIRECT_URL = "room_list"
+LOGOUT_REDIRECT_URL = "login"
 
 
 # ============================================================

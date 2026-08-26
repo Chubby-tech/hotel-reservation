@@ -7,7 +7,8 @@
   <section class="search-card" style="margin: 0 auto 2.5rem;">
     <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
       <span style="font-weight: 700; color: #fff; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
-        📅 Check Availability & Real-Time Booking
+        <svg style="width: 20px; height: 20px; fill: none; stroke: var(--accent); stroke-width: 2;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        Check Availability & Real-Time Booking
       </span>
       <span style="color: var(--accent); font-size: 0.85rem; font-weight: 600;">Standard Check-in: 2:00 PM | Check-out: 11:00 AM</span>
     </div>
@@ -16,22 +17,31 @@
       <div class="search-form__row">
         <div>
           <label style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">
-            <span>🗓️ Check-In Date</span>
-            <input type="date" name="check_in" id="home_check_in" value="{{ request_get.check_in|default:'' }}" required style="width: 100%; padding: 0.85rem 1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;">
+            <span>Check-In Date</span>
+            <div class="input-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <input type="date" name="check_in" id="home_check_in" value="{{ request_get.check_in|default:'' }}" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); font-size: 0.95rem;">
+            </div>
           </label>
         </div>
 
         <div>
           <label style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">
-            <span>🗓️ Check-Out Date</span>
-            <input type="date" name="check_out" id="home_check_out" value="{{ request_get.check_out|default:'' }}" required style="width: 100%; padding: 0.85rem 1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;">
+            <span>Check-Out Date</span>
+            <div class="input-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <input type="date" name="check_out" id="home_check_out" value="{{ request_get.check_out|default:'' }}" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); font-size: 0.95rem;">
+            </div>
           </label>
         </div>
 
         <div>
           <label style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">
-            <span>👥 Guests</span>
-            <input type="number" name="guests" min="1" max="10" value="{{ request_get.guests|default:1 }}" required style="width: 100%; padding: 0.85rem 1rem; background: #090e14; border: 1px solid var(--line); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;">
+            <span>Guests</span>
+            <div class="input-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <input type="number" name="guests" min="1" max="10" value="{{ request_get.guests|default:1 }}" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); font-size: 0.95rem;">
+            </div>
           </label>
         </div>
 

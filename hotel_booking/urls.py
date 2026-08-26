@@ -14,7 +14,7 @@ urlpatterns = [
     ),
     path(
         "accounts/logout/",
-        auth_views.LogoutView.as_view(next_page="room_list"),
+        auth_views.LogoutView.as_view(next_page="login"),
         name="logout",
     ),
     path("", include("bookings.urls")),
